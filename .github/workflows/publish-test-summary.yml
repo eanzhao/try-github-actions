@@ -1,7 +1,7 @@
 name: Publish Test Summary
 on:
   workflow_run:
-    workflows: ["build-and-test"]
+    workflows: ["test"]
     types:
       - completed
 
