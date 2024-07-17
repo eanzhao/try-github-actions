@@ -1,4 +1,4 @@
-name: build-and-test
+name: Build and Test
 on:
   push:
     branches:
@@ -24,10 +24,13 @@ jobs:
           dotnet-version: '8.0'
 
       - name: Build Solution
-        run: dotnet build try-github-actions.sln
+        run: dotnet build ${{ env.Solution_Name }}
 
       - name: Run Tests
-        run: dotnet test --logger "trx;LogFileName=TestResults.trx" ${{ env.Solution_Name }}
+        run: sudo dotnet test --logger "trx;LogFileName=TestResults.trx" ${{ env.Solution_Name }}
+
+      - name: List directory contents
+        run: ls -la
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v2
