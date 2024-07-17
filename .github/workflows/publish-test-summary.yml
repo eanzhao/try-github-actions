@@ -17,6 +17,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: test-summary
+          path: Summary.json
 
       - name: Publish Test Summary
         uses: peaceiris/actions-gh-pages@v3
