@@ -1,44 +1,27 @@
-name: Test
 on:
   push:
     branches:
       - dev
       - master
 
-env:
-  DOTNET_INSTALL_DIR: "./.dotnet"
-  Solution_Name: try-github-actions.sln
+permissions:
+  contents: read
+  actions: read
+  checks: write
 
 jobs:
-  test:
+  build-test:
+    name: Build & Test
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4     # checkout the repo
+      - run: npm ci                   # install packages
+      - run: npm test                 # run tests (configured to use jest-junit reporter)
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
         with:
-          dotnet-version: '8.0'
-
-      - name: Build Solution
-        run: dotnet build ${{ env.Solution_Name }}
-
-      - name: Install Report Generator tool
-        run: |
-          dotnet tool install --global dotnet-reportgenerator-globaltool
-          echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
-
-      - name: Run Tests
-        run: dotnet test --logger "trx;LogFileName=TestResults.trx" --collect:"Code Coverage" ${{ env.Solution_Name }}
-
-      - name: Merge Test Results
-        run: reportgenerator "-reports:**/*.trx" "-targetdir:." -reporttypes:JsonSummary
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-summary
-          path: Summary.json
+          name: JEST Tests            # Name of the check run which will be created
+          path: reports/jest-*.xml    # Path to test results
+          reporter: jest-junit        # Format of test results
