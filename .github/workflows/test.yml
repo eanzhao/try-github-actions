@@ -37,7 +37,10 @@ jobs:
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
       - name: Generate Test Report
-        run: reportgenerator "-reports:**/TestResults/*.xml" "-targetdir:TestResults" -reporttypes:Cobertura
+        run: reportgenerator "-reports:**/TestResults/*.xml" "-targetdir:." -reporttypes:Cobertura
+
+      - name: Rename Test Report
+        run: mv Cobertura.xml cobertura.xml
 
       - name: Upload to Gist
         uses: gaelgirodon/ci-badges-action@v1
