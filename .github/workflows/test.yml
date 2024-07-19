@@ -38,9 +38,15 @@ jobs:
       - name: Extract Test Counts
         id: test_counts
         run: |
-          passed=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@passed" **/TestResults.xml)
-          failed=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@failed" **/TestResults.xml)
-          skipped=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@skipped" **/TestResults.xml)
+          passed=0
+          failed=0
+          skipped=0
+          for file in $(find . -name 'TestResults.xml')
+          do
+            passed=$((passed + $(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@passed" "$file")))
+            failed=$((failed + $(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@failed" "$file")))
+            skipped=$((skipped + $(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@skipped" "$file")))
+          done
           echo "::set-output name=passed::$passed"
           echo "::set-output name=failed::$failed"
           echo "::set-output name=skipped::$skipped"
