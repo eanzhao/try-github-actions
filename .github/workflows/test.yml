@@ -66,14 +66,14 @@ jobs:
             
             let gist;
             try {
-              gist = await github.gists.get({ gist_id: gistId });
+              gist = await github.rest.gists.get({ gist_id: gistId });
             } catch (error) {
               if (error.status !== 404) {
                 throw error;
               }
             }
 
-            await github.gists.update({
+            await github.rest.gists.update({
               gist_id: gistId,
               files: {
                 [filename]: { content }
