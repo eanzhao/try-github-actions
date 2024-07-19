@@ -25,13 +25,6 @@ jobs:
       - run: dotnet build --no-restore
       - run: dotnet test --no-build --no-restore --verbosity normal -l:"trx;LogFileName=TestResults.xml"
 
-#      - name: Test Report
-#        uses: dorny/test-reporter@v1
-#        if: always()
-#        with:
-#          name: Test results
-#          path:  '**/TestResults/*.xml'
-#          reporter: dotnet-trx
       - name: Install xmlstarlet
         run: sudo apt-get install -y xmlstarlet
 
@@ -45,7 +38,9 @@ jobs:
           do
             passed=$((passed + $(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@passed" "$file")))
             failed=$((failed + $(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@failed" "$file")))
-            skipped=$((skipped + $(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@skipped" "$file")))
+            total=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@total" "$file")
+            executed=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@executed" "$file")
+            skipped=$((total - executed))
           done
           echo "::set-output name=passed::$passed"
           echo "::set-output name=failed::$failed"
@@ -62,8 +57,9 @@ jobs:
             const skipped = "${{ steps.test_counts.outputs.skipped }}";
             const gistId = "59e13bd3823d754542ac98d24b3329b4";
             const filename = "test-results.json";
-            const content = `{"schemaVersion":1,"label":"tests","message":"${passed} passed, ${failed} failed, ${skipped} skipped","color":"brightgreen"}`;
-            
+            const color = failed > 0 ? "red" : "brightgreen";
+            const content = `{"schemaVersion":1,"label":"tests","message":"${passed} passed, ${failed} failed, ${skipped} skipped","color":"${color}"}`;
+
             let gist;
             try {
               gist = await github.rest.gists.get({ gist_id: gistId });
