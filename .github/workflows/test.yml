@@ -26,7 +26,9 @@ jobs:
       - run: dotnet test --no-build --no-restore --verbosity normal -l:"trx;LogFileName=TestResults.xml"
 
       - name: Install xmlstarlet
-        run: sudo apt-get install -y xmlstarlet
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xmlstarlet
 
       - name: Extract Test Counts
         id: test_counts
@@ -37,10 +39,13 @@ jobs:
           for file in $(find . -name 'TestResults.xml')
           do
             passed=$((passed + $(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@passed" "$file")))
+            echo "Passed: $passed"
             failed=$((failed + $(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@failed" "$file")))
+            echo "Failed: $failed"
             total=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@total" "$file")
             executed=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@executed" "$file")
             skipped=$((total - executed))
+            echo "Skipped: $skipped"
           done
           echo "::set-output name=passed::$passed"
           echo "::set-output name=failed::$failed"
