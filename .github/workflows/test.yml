@@ -37,13 +37,10 @@ jobs:
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
       - name: Generate Test Report
-        run: reportgenerator "-reports:**/TestResults/*.xml" "-targetdir:TestResults" -reporttypes:JsonSummary
-        
-      - name: Upload to Codecov
-        uses: codecov/codecov-action@v2
+        run: reportgenerator "-reports:**/TestResults/*.xml" "-targetdir:TestResults" -reporttypes:Cobertura
+
+      - name: Upload to Gist
+        uses: gaelgirodon/ci-badges-action@v1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./TestResults/Summary.json
-          fail_ci_if_error: true
-          
-      
+          gist-id: 59e13bd3823d754542ac98d24b3329b4
+          token: ${{ secrets.GIST_TOKEN }}
