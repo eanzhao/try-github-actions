@@ -14,8 +14,8 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4     # checkout the repo
-        
+      - uses: actions/checkout@v4
+
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
@@ -27,8 +27,22 @@ jobs:
 
       - name: Test Report
         uses: dorny/test-reporter@v1
-        if: success() || failure()
+        if: always()
         with:
           name: Test results
           path:  '**/TestResults/*.xml'
           reporter: dotnet-trx
+
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Generate Test Report
+        run: reportgenerator "-reports:**/TestResults/*.xml" "-targetdir:TestResults" -reporttypes:JsonSummary
+        
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./TestResults/Summary.json
+          fail_ci_if_error: true
+          
+      
