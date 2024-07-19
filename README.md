@@ -1,5 +1,5 @@
 ![Build](https://github.com/eanzhao/try-github-actions/actions/workflows/build.yml/badge.svg?branch=master)
 
-[![codecov](https://codecov.io/gh/eanzhao/try-github-actions/branch/master/graph/badge.svg)](https://codecov.io/gh/eanzhao/try-github-actions)
+![Test](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/eanzhao/59e13bd3823d754542ac98d24b3329b4/raw/test-results.json)
 
 
