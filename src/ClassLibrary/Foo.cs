@@ -2,8 +2,13 @@
 
 public class Foo
 {
-    public int Bar()
+    public int Bar(int bar)
     {
-        return 42;
+        return bar + 42;
+    }
+
+    public string Concat(string a, string b)
+    {
+        return $"{a} {b}";
     }
 }

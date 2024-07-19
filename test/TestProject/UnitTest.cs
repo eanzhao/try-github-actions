@@ -8,6 +8,12 @@ public class UnitTest
     [Fact]
     public void FooTest()
     {
-        new Foo().Bar().ShouldBe(42);
+        new Foo().Bar(0).ShouldBe(42);
+    }
+
+    [Fact]
+    public void ConcatTest()
+    {
+        new Foo().Concat("a", "b").ShouldBe("a b");
     }
 }

@@ -23,25 +23,27 @@ jobs:
 
       - run: dotnet restore
       - run: dotnet build --no-restore
-      - run: dotnet test --no-build --no-restore --filter Category=SanityTest --verbosity normal -l:"trx;LogFileName=TestResults.xml"
+      - run: dotnet test --no-build --no-restore --verbosity normal -l:"trx;LogFileName=TestResults.xml"
 
-      - name: Test Report
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: Test results
-          path:  '**/TestResults/*.xml'
-          reporter: dotnet-trx
+#      - name: Test Report
+#        uses: dorny/test-reporter@v1
+#        if: always()
+#        with:
+#          name: Test results
+#          path:  '**/TestResults/*.xml'
+#          reporter: dotnet-trx
+      - name: Install xmlstarlet
+        run: sudo apt-get install -y xmlstarlet
 
       - name: Extract Test Counts
         id: test_counts
         run: |
-          passed=$(jq '.summary.counters.passed' **/TestResults.json)
-          failed=$(jq '.summary.counters.failed' **/TestResults.json)
-          skipped=$(jq '.summary.counters.skipped' **/TestResults.json)
+          passed=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@passed" **/TestResults.xml)
+          failed=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@failed" **/TestResults.xml)
+          skipped=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@skipped" **/TestResults.xml)
           echo "::set-output name=passed::$passed"
           echo "::set-output name=failed::$failed"
-          echo "::set-output name=skipped::$skipped"`
+          echo "::set-output name=skipped::$skipped"
 
       - name: Update Gist
         uses: actions/github-script@v5
