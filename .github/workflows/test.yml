@@ -36,9 +36,9 @@ jobs:
       - name: Extract Test Counts
         id: test_counts
         run: |
-          passed=$(jq '.summary.counters.passed' TestResults.json)
-          failed=$(jq '.summary.counters.failed' TestResults.json)
-          skipped=$(jq '.summary.counters.skipped' TestResults.json)
+          passed=$(jq '.summary.counters.passed' **/TestResults.json)
+          failed=$(jq '.summary.counters.failed' **/TestResults.json)
+          skipped=$(jq '.summary.counters.skipped' **/TestResults.json)
           echo "::set-output name=passed::$passed"
           echo "::set-output name=failed::$failed"
           echo "::set-output name=skipped::$skipped"`
