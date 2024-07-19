@@ -33,17 +33,41 @@ jobs:
           path:  '**/TestResults/*.xml'
           reporter: dotnet-trx
 
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+      - name: Extract Test Counts
+        id: test_counts
+        run: |
+          passed=$(jq '.summary.counters.passed' TestResults.json)
+          failed=$(jq '.summary.counters.failed' TestResults.json)
+          skipped=$(jq '.summary.counters.skipped' TestResults.json)
+          echo "::set-output name=passed::$passed"
+          echo "::set-output name=failed::$failed"
+          echo "::set-output name=skipped::$skipped"`
 
-      - name: Generate Test Report
-        run: reportgenerator "-reports:**/TestResults/*.xml" "-targetdir:." -reporttypes:Cobertura
-
-      - name: Rename Test Report
-        run: mv Cobertura.xml cobertura.xml
-
-      - name: Upload to Gist
-        uses: gaelgirodon/ci-badges-action@v1
+      - name: Update Gist
+        uses: actions/github-script@v5
         with:
-          gist-id: 59e13bd3823d754542ac98d24b3329b4
-          token: ${{ secrets.GIST_TOKEN }}
+          github-token: ${{secrets.GIST_TOKEN}}
+          script: |
+            const fs = require('fs');
+            const passed = "${{ steps.test_counts.outputs.passed }}";
+            const failed = "${{ steps.test_counts.outputs.failed }}";
+            const skipped = "${{ steps.test_counts.outputs.skipped }}";
+            const gistId = "59e13bd3823d754542ac98d24b3329b4";
+            const filename = "test-results.json";
+            const content = `{"schemaVersion":1,"label":"tests","message":"${passed} passed, ${failed} failed, ${skipped} skipped","color":"brightgreen"}`;
+            
+            let gist;
+            try {
+              gist = await github.gists.get({ gist_id: gistId });
+            } catch (error) {
+              if (error.status !== 404) {
+                throw error;
+              }
+            }
+
+            await github.gists.update({
+              gist_id: gistId,
+              files: {
+                [filename]: { content }
+              }
+            });
