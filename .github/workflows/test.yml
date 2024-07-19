@@ -40,17 +40,18 @@ jobs:
           for file in $(find . -name 'TestResults.xml')
           do
             echo "Processing file: $file"
-            passed_value=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@passed" "$file")
+            passed_value=$(xmlstarlet sel -N x="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "/x:TestRun/x:ResultSummary/x:Counters/@passed" "$file")
             echo "Passed value from xmlstarlet: $passed_value"
             passed=$((passed + passed_value))
-            failed_value=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@failed" "$file")
+            failed_value=$(xmlstarlet sel -N x="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "/x:TestRun/x:ResultSummary/x:Counters/@failed" "$file")
             echo "Failed value from xmlstarlet: $failed_value"
             failed=$((failed + failed_value))
-            total_value=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@total" "$file")
+            total_value=$(xmlstarlet sel -N x="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "/x:TestRun/x:ResultSummary/x:Counters/@total" "$file")
             echo "Total value from xmlstarlet: $total_value"
-            executed_value=$(xmlstarlet sel -t -v "/TestRun/ResultSummary/Counters/@executed" "$file")
+            executed_value=$(xmlstarlet sel -N x="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" -t -v "/x:TestRun/x:ResultSummary/x:Counters/@executed" "$file")
             echo "Executed value from xmlstarlet: $executed_value"
-            skipped=$((total_value - executed_value))
+            skipped_value=$((total_value - executed_value))
+            skipped=$((skipped + skipped_value))
             echo "Skipped: $skipped"
           done
           echo "PASSED=$passed" >> $GITHUB_ENV
