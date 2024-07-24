@@ -95,7 +95,6 @@ jobs:
             const filePath = path.join(process.env.GITHUB_WORKSPACE, filename);
             const fileContent = fs.readFileSync(filePath, 'utf8');
 
-            const github = require('@actions/github');
             const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
 
             await octokit.repos.createOrUpdateFileContents({
