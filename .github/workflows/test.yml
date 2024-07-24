@@ -83,7 +83,7 @@ jobs:
             fs.writeFileSync(filename, content);
 
       - name: Commit and push
-        uses: actions/github-script@v3
+        uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.COMMIT_TOKEN }}
           script: |
