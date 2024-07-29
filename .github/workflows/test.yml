@@ -14,9 +14,9 @@ jobs:
       contents: write
     steps:
       - name: Run dotnet ci action
-        uses: eanzhao/dotnet-ci@v0.1.2
+        uses: eanzhao/dotnet-ci@v0.1.6
         with:
-          commit-token: ${{ secrets.COMMIT-TOKEN }}
+          commit-token: ${{ secrets.COMMIT_TOKEN }}
           codecov-token: ${{ secrets.CODECOV_TOKEN }}
           branch-name: "feature/badge"
           solution-name: "try-github-actions.sln"
